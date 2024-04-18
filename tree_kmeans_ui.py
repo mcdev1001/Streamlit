@@ -1,17 +1,20 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier, export_graphviz, plot_tree
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
 from sklearn.svm import OneClassSVM
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-import matplotlib.pyplot as plt
 from PIL import Image
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 import os
+import matplotlib.pyplot as plt
+#from streamlit_agraph import agraph, Node, Edge, Config 
+from pyvis.network import Network
+import pydotplus  # Required for plotting the decision tree
 
 # Load the data
 @st.cache_data
@@ -48,10 +51,37 @@ tree_classifier.fit(X_train, np.where(svm_model.predict(X_train) == 1, 0, 1))
 
 # Decision Tree visualization
 st.header('Decision Tree Visualization')
-plt.figure(figsize=(12, 8))
-export_graphviz(tree_classifier, out_file=None, feature_names=X.columns.tolist(), filled=True, rounded=True, class_names=["Inlier", "Outlier"])
-plt.title('Decision Tree Visualization')
-st.pyplot(plt)
+
+# Export the decision tree to Graphviz format
+dot_data = export_graphviz(
+    tree_classifier,
+    out_file=None,
+    feature_names=X.columns.tolist(),
+    filled=True,
+    rounded=True,
+    class_names=["Inlier", "Outlier"]
+)
+
+# Create a Dot object from the Graphviz format data
+graph = pydotplus.graph_from_dot_data(dot_data)
+# Display the graph in Streamlit
+st.graphviz_chart(dot_data)
+
+#agraph(graph)
+
+# Convert the Dot data to a Pyvis network graph
+#network = Network()
+#network.from_DOT(pydotplus.graph_from_dot_data(dot_data(dot_data))[0].to_string())
+
+# Display the Pyvis network graph
+#st.pyvis_chart(network)
+
+
+# Convert the Dot object to a PNG image
+#image = graph.create_png()
+
+# Display the PNG image
+#st.image(image, caption='Decision Tree Visualization')
 
 # One-Class SVM results
 st.header('One-Class SVM Results')
