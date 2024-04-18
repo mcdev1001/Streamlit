@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.tree import DecisionTreeClassifier, export_graphviz, plot_tree
 from sklearn.svm import OneClassSVM
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
@@ -48,9 +48,10 @@ tree_classifier.fit(X_train, np.where(svm_model.predict(X_train) == 1, 0, 1))
 
 # Decision Tree visualization
 st.header('Decision Tree Visualization')
-fig, ax = plt.subplots(figsize=(15, 20))  
-plot_tree(tree_classifier, filled=True, feature_names=X.columns, class_names=["Inlier", "Outlier"], max_depth=4, ax=ax)
-st.pyplot(fig)
+plt.figure(figsize=(12, 8))
+export_graphviz(tree_classifier, out_file=None, feature_names=X.columns.tolist(), filled=True, rounded=True, class_names=["Inlier", "Outlier"])
+plt.title('Decision Tree Visualization')
+st.pyplot(plt)
 
 # One-Class SVM results
 st.header('One-Class SVM Results')
@@ -129,4 +130,3 @@ ax.legend()
 
 # Show plot in Streamlit
 st.pyplot(fig)
-
